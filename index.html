@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KerWork 模型档位原型</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: #fff; color: #1f1f1f; overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+.app { display: flex; height: 100vh; }
+
+/* ---------- 侧边栏 ---------- */
+.sidebar {
+  width: 300px; flex-shrink: 0; background: #f7f7f5;
+  display: flex; flex-direction: column; padding: 14px 12px 16px;
+}
+.side-top { display: flex; align-items: center; justify-content: space-between; padding: 2px 4px 0; }
+.traffic { display: flex; gap: 8px; }
+.traffic span { width: 12px; height: 12px; border-radius: 50%; }
+.t-red { background: #ff5f57; } .t-yellow { background: #febc2e; } .t-green { background: #28c840; }
+.collapse-btn { background: none; border: none; cursor: pointer; color: #8a8a86; padding: 4px; border-radius: 6px; display: flex; }
+.collapse-btn:hover { background: #ececea; }
+.new-task {
+  margin-top: 14px; display: flex; align-items: center; gap: 8px;
+  background: #fff; border: 1px solid #e7e7e4; border-radius: 10px;
+  padding: 10px 12px; font-size: 14px; font-weight: 500; color: #2b2b2b;
+  cursor: pointer; width: 100%;
+}
+.new-task:hover { background: #fcfcfb; }
+.nav-item {
+  margin-top: 6px; display: flex; align-items: center; gap: 9px;
+  padding: 10px 12px; font-size: 14px; color: #2b2b2b; border-radius: 8px; cursor: pointer;
+}
+.nav-item:hover { background: #efefec; }
+.section-label { margin: 22px 0 6px; padding: 0 12px; font-size: 12.5px; color: #ababa6; }
+.group {
+  display: flex; align-items: center; gap: 9px; padding: 9px 12px;
+  font-size: 14.5px; color: #2b2b2b; border-radius: 8px; cursor: pointer;
+}
+.group:hover { background: #efefec; }
+.sidebar-bottom { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 6px 8px 0; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #f3c1bb, #e9a49c); }
+.uname { font-size: 14px; color: #2b2b2b; }
+.gear { margin-left: auto; background: none; border: none; cursor: pointer; color: #6f6f6b; padding: 4px; border-radius: 6px; display: flex; }
+.gear:hover { background: #ececea; }
+
+/* ---------- 主区域 ---------- */
+.main { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 9vh; }
+.logo { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); }
+.center { display: flex; flex-direction: column; align-items: center; width: 100%; }
+.headline { font-size: 34px; font-weight: 600; color: #141414; }
+
+.input-wrap { position: relative; width: 720px; margin-top: 40px; }
+.promo {
+  position: absolute; top: -36px; right: -46px; z-index: 5;
+  display: flex; align-items: center; gap: 7px;
+  background: #3c3c3a; color: #fff; font-size: 12.5px;
+  padding: 8px 12px; border-radius: 10px; white-space: nowrap;
+}
+.input-card {
+  background: #fff; border: 1px solid #ececea; border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.04); padding: 6px 8px 8px;
+}
+.input-card textarea {
+  width: 100%; border: none; outline: none; resize: none;
+  font-size: 15px; font-family: inherit; color: #2b2b2b;
+  padding: 14px 14px 2px; height: 44px; line-height: 1.5;
+}
+.input-card textarea::placeholder { color: #b9b9b5; }
+.toolbar { display: flex; align-items: center; padding: 4px 6px 2px; }
+.tool-btn {
+  width: 32px; height: 32px; border-radius: 50%; border: 1px solid #e7e7e4;
+  background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #55554f;
+}
+.tool-btn:hover { background: #f6f6f4; }
+.spacer { flex: 1; }
+.send-btn {
+  width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+  background: #efefec; color: #a0a09a; display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s;
+}
+.send-btn.active { background: #4553ff; color: #fff; }
+
+/* ---------- 权限选择器 ---------- */
+.perm-selector {
+  position: relative; display: flex; align-items: center; gap: 6px;
+  padding: 7px 12px; border-radius: 999px; cursor: pointer;
+  font-size: 14px; color: #3c3c38; margin-left: 6px;
+}
+.perm-selector:hover { background: #f6f6f4; }
+.perm-selector.elevated { color: #d5493a; }
+.perm-selector .chevron { color: #a0a09a; }
+
+/* ---------- 档位选择器 ---------- */
+.tier-selector {
+  position: relative; display: flex; align-items: center; gap: 6px;
+  padding: 7px 10px; border-radius: 10px; cursor: pointer;
+  font-size: 14.5px; color: #2b2b2b;
+}
+.tier-selector:hover { background: #f6f6f4; }
+.tier-selector .chevron { color: #a0a09a; }
+
+/* ---------- 下拉菜单 ---------- */
+.menu {
+  position: absolute; bottom: calc(100% + 10px); display: none;
+  background: #fff; border: 1px solid #ececea; border-radius: 14px;
+  box-shadow: 0 10px 36px rgba(0,0,0,0.12); padding: 6px; z-index: 20;
+}
+.menu.open { display: block; animation: pop .14s ease-out; }
+@keyframes pop { from { opacity: 0; transform: translateY(4px) scale(.98); } to { opacity: 1; transform: none; } }
+.perm-menu { left: 0; width: 300px; }
+.tier-menu { right: -60px; width: 300px; }
+.menu-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+.menu-item:hover { background: #f6f6f4; }
+.mi-main { flex: 1; min-width: 0; }
+.mi-name { font-size: 14.5px; color: #222; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.mi-desc { font-size: 12.5px; color: #9a9a96; margin-top: 3px; line-height: 1.5; }
+.mi-rate { font-size: 12.5px; color: #9a9a96; padding-top: 2px; }
+.mi-check { width: 16px; visibility: hidden; padding-top: 2px; color: #4553ff; }
+.menu-item.selected .mi-check { visibility: visible; }
+.perm-menu .mi-icon { color: #6f6f6b; padding-top: 1px; }
+.perm-menu .mi-icon.danger { color: #d5493a; }
+
+/* ---------- 输入区下方 ---------- */
+.workspace-chip {
+  margin-top: 14px; margin-left: 4px; display: inline-flex; align-items: center; gap: 7px;
+  background: #f3f3f1; border: none; border-radius: 8px; padding: 8px 13px;
+  font-size: 13px; color: #4a4a46; cursor: pointer;
+}
+.workspace-chip:hover { background: #ececea; }
+.chips-row { margin-top: 24px; width: 900px; display: flex; align-items: center; gap: 12px; }
+.chip {
+  display: flex; align-items: center; gap: 7px; background: #fff;
+  border: 1px solid #ececea; border-radius: 999px; padding: 9px 16px;
+  font-size: 13.5px; color: #4a4a46; cursor: pointer; white-space: nowrap;
+}
+.chip:hover { background: #fafaf8; }
+.chip svg { color: #8a8a86; }
+.chips-more { background: none; border: none; cursor: pointer; color: #a0a09a; padding: 6px; border-radius: 50%; display: flex; }
+.chips-more:hover { background: #f6f6f4; }
+
+/* ---------- 弹窗 ---------- */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.3);
+  display: none; align-items: center; justify-content: center; z-index: 50;
+}
+.overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 16px; width: 380px; padding: 26px 24px 20px; text-align: center; }
+.modal h3 { font-size: 15.5px; color: #1f1f1f; font-weight: 600; }
+.modal p { font-size: 13px; color: #6f6f6b; line-height: 1.7; margin-top: 12px; text-align: left; }
+.modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+.modal-actions button {
+  flex: 1; padding: 9px 0; border-radius: 8px; font-size: 14px; cursor: pointer; border: none;
+}
+.btn-cancel { background: #f3f3f1; color: #3c3c38; }
+.btn-cancel:hover { background: #ececea; }
+.btn-confirm { background: #d5493a; color: #fff; }
+.btn-confirm:hover { background: #c43f31; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="side-top">
+      <div class="traffic"><span class="t-red"></span><span class="t-yellow"></span><span class="t-green"></span></div>
+      <button class="collapse-btn" title="收起边栏">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="9.5" y1="4" x2="9.5" y2="20"/></svg>
+      </button>
+    </div>
+    <button class="new-task">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="4"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      新建任务
+    </button>
+    <div class="nav-item">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4 2.5 8.5 12 13l9.5-4.5L12 4z"/><path d="M6 10.5V15c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/><line x1="21.5" y1="9" x2="21.5" y2="14"/></svg>
+      专家
+    </div>
+    <div class="section-label">任务列表</div>
+    <div class="group">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+      默认
+    </div>
+    <div class="sidebar-bottom">
+      <div class="avatar"></div>
+      <span class="uname">Test</span>
+      <button class="gear" title="设置">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.5-2.3 1a7 7 0 0 0-2.1-1.2L14 3h-4l-.4 2.6a7 7 0 0 0-2.1 1.2l-2.3-1-2 3.5 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.5 2.3-1a7 7 0 0 0 2.1 1.2L10 21h4l.4-2.6a7 7 0 0 0 2.1-1.2l2.3 1 2-3.5-2-1.5c.1-.4.1-.8.1-1.2z"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="logo">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect x="3" y="3" width="26" height="26" rx="9" stroke="#2b2b2b" stroke-width="2.4"/><circle cx="11.5" cy="14.5" r="2" fill="#2b2b2b"/><circle cx="20.5" cy="14.5" r="2" fill="#2b2b2b"/><path d="M11 20.5c1.4 1.4 3.1 2.1 5 2.1s3.6-.7 5-2.1" stroke="#2b2b2b" stroke-width="2.2" stroke-linecap="round"/></svg>
+    </div>
+
+    <div class="center">
+      <h1 class="headline">工作与生活，万事可 Work</h1>
+
+      <div class="input-wrap">
+        <div class="promo">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="18" height="13" rx="2"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="12" y1="8" x2="12" y2="21"/><path d="M12 8c-2.5 0-4.5-1-4.5-2.7C7.5 4 8.4 3 9.7 3 11.6 3 12 5.5 12 8zm0 0c2.5 0 4.5-1 4.5-2.7C16.5 4 15.6 3 14.3 3 12.4 3 12 5.5 12 8z"/></svg>
+          邀请好友即送价值 49 元涡轮加速包，双方同享！
+        </div>
+
+        <div class="input-card">
+          <textarea id="taskInput" rows="1" placeholder="KerWork会在你电脑里自动查找并完成，@引用附件"></textarea>
+          <div class="toolbar">
+            <button class="tool-btn" title="添加附件">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+
+            <div class="perm-selector" id="permSelector">
+              <span class="perm-icon" id="permIcon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8-7.5 9.5-4.3-1.5-7.5-4.9-7.5-9.5V6L12 3z"/></svg>
+              </span>
+              <span id="permLabel">默认权限</span>
+              <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+              <div class="menu perm-menu" id="permMenu">
+                <div class="menu-item selected" data-perm="default">
+                  <span class="mi-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8-7.5 9.5-4.3-1.5-7.5-4.9-7.5-9.5V6L12 3z"/></svg></span>
+                  <div class="mi-main">
+                    <div class="mi-name">默认权限</div>
+                    <div class="mi-desc">适合大多数任务，删除、覆盖等高风险操作会先询问你</div>
+                  </div>
+                  <span class="mi-check"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4.5 12.5l5 5 10-11"/></svg></span>
+                </div>
+                <div class="menu-item" data-perm="full">
+                  <span class="mi-icon danger"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3.5 1.8 20.5h20.4L12 3.5z"/><line x1="12" y1="10" x2="12" y2="15"/><circle cx="12" cy="17.6" r="0.4" fill="currentColor"/></svg></span>
+                  <div class="mi-main">
+                    <div class="mi-name">完全访问</div>
+                    <div class="mi-desc">减少确认步骤，建议仅在信任的工作区开启</div>
+                  </div>
+                  <span class="mi-check"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4.5 12.5l5 5 10-11"/></svg></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="spacer"></div>
+
+            <div class="tier-selector" id="tierSelector">
+              <span id="tierLabel">均衡</span>
+              <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+              <div class="menu tier-menu" id="tierMenu">
+                <div class="menu-item" data-tier="极速">
+                  <div class="mi-main">
+                    <div class="mi-name">极速</div>
+                    <div class="mi-desc">快速出结果</div>
+                  </div>
+                  <span class="mi-rate">0.5X</span>
+                  <span class="mi-check"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4.5 12.5l5 5 10-11"/></svg></span>
+                </div>
+                <div class="menu-item selected" data-tier="均衡">
+                  <div class="mi-main">
+                    <div class="mi-name">均衡</div>
+                    <div class="mi-desc">日常任务首选</div>
+                  </div>
+                  <span class="mi-rate">1X</span>
+                  <span class="mi-check"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4.5 12.5l5 5 10-11"/></svg></span>
+                </div>
+                <div class="menu-item" data-tier="深度">
+                  <div class="mi-main">
+                    <div class="mi-name">深度</div>
+                    <div class="mi-desc">复杂任务与精细处理</div>
+                  </div>
+                  <span class="mi-rate">2X</span>
+                  <span class="mi-check"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4.5 12.5l5 5 10-11"/></svg></span>
+                </div>
+              </div>
+            </div>
+
+            <button class="send-btn" id="sendBtn" title="发送">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="19" x2="12" y2="6"/><path d="M6 12l6-6 6 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <button class="workspace-chip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+          选择工作区
+        </button>
+
+        <div class="chips-row">
+          <button class="chip">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="12" rx="2"/><line x1="8" y1="20" x2="16" y2="20"/></svg>
+            做一份年终汇报 PPT
+          </button>
+          <button class="chip">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><line x1="5" y1="20" x2="5" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="19" y1="20" x2="19" y2="9"/></svg>
+            分析这份销售数据
+          </button>
+          <button class="chip">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 5.5C10 3.8 7 3.5 4 4v15c3-.5 6-.2 8 1.5 2-1.7 5-2 8-1.5V4c-3-.5-6-.2-8 1.5z"/><line x1="12" y1="5.5" x2="12" y2="20.5"/></svg>
+            查宁德时代最新行情
+          </button>
+          <button class="chip">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1z"/></svg>
+            写一篇小红书爆款文案
+          </button>
+          <button class="chips-more">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3>切换到完全访问？</h3>
+    <p>完全访问模式下，KerWork 将减少操作确认步骤，并可执行更多文件和系统操作。建议仅在你信任当前工作区时开启。</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="cancelBtn">取消</button>
+      <button class="btn-confirm" id="confirmBtn">确认切换</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const tierSelector = document.getElementById('tierSelector');
+const tierMenu = document.getElementById('tierMenu');
+const tierLabel = document.getElementById('tierLabel');
+const permSelector = document.getElementById('permSelector');
+const permMenu = document.getElementById('permMenu');
+const permLabel = document.getElementById('permLabel');
+const permIcon = document.getElementById('permIcon');
+const overlay = document.getElementById('overlay');
+const taskInput = document.getElementById('taskInput');
+const sendBtn = document.getElementById('sendBtn');
+
+const shieldSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8-7.5 9.5-4.3-1.5-7.5-4.9-7.5-9.5V6L12 3z"/></svg>';
+const alertSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3.5 1.8 20.5h20.4L12 3.5z"/><line x1="12" y1="10" x2="12" y2="15"/><circle cx="12" cy="17.6" r="0.4" fill="currentColor"/></svg>';
+
+function closeMenus() {
+  tierMenu.classList.remove('open');
+  permMenu.classList.remove('open');
+}
+
+tierSelector.addEventListener('click', (e) => {
+  const willOpen = !tierMenu.classList.contains('open');
+  closeMenus();
+  if (willOpen) tierMenu.classList.add('open');
+  e.stopPropagation();
+});
+
+permSelector.addEventListener('click', (e) => {
+  const willOpen = !permMenu.classList.contains('open');
+  closeMenus();
+  if (willOpen) permMenu.classList.add('open');
+  e.stopPropagation();
+});
+
+tierMenu.querySelectorAll('.menu-item').forEach((item) => {
+  item.addEventListener('click', (e) => {
+    e.stopPropagation();
+    tierMenu.querySelectorAll('.menu-item').forEach((i) => i.classList.remove('selected'));
+    item.classList.add('selected');
+    tierLabel.textContent = item.dataset.tier;
+    closeMenus();
+  });
+});
+
+permMenu.querySelectorAll('.menu-item').forEach((item) => {
+  item.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (item.dataset.perm === 'full') {
+      closeMenus();
+      overlay.classList.add('show');
+    } else {
+      applyPerm(false);
+      closeMenus();
+    }
+  });
+});
+
+function applyPerm(full) {
+  permMenu.querySelectorAll('.menu-item').forEach((i) => {
+    i.classList.toggle('selected', (i.dataset.perm === 'full') === full);
+  });
+  permSelector.classList.toggle('elevated', full);
+  permLabel.textContent = full ? '完全访问' : '默认权限';
+  permIcon.innerHTML = full ? alertSvg : shieldSvg;
+}
+
+document.getElementById('cancelBtn').addEventListener('click', () => overlay.classList.remove('show'));
+document.getElementById('confirmBtn').addEventListener('click', () => {
+  applyPerm(true);
+  overlay.classList.remove('show');
+});
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay) overlay.classList.remove('show');
+});
+
+document.addEventListener('click', closeMenus);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeMenus(); overlay.classList.remove('show'); }
+});
+
+taskInput.addEventListener('input', () => {
+  sendBtn.classList.toggle('active', taskInput.value.trim().length > 0);
+});
+</script>
+</body>
+</html>
