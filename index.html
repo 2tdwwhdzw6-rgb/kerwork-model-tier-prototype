@@ -279,6 +279,16 @@ body {
 .btn-cancel:hover { background: #ececea; }
 .btn-confirm { background: #d5493a; color: #fff; }
 .btn-confirm:hover { background: #c43f31; }
+.btn-confirm:disabled { background: #f0b9b2; cursor: not-allowed; }
+.btn-confirm:disabled:hover { background: #f0b9b2; }
+.cap-list { margin: 12px 0 0; padding-left: 20px; text-align: left; list-style: disc; }
+.cap-list li { font-size: 12.5px; color: #6f6f6b; line-height: 1.8; }
+.cap-list li b { color: #3c3c38; font-weight: 500; }
+.risk-check {
+  display: flex; align-items: center; gap: 7px; margin-top: 14px;
+  font-size: 12.5px; color: #3c3c38; cursor: pointer; text-align: left;
+}
+.risk-check input { accent-color: #d5493a; width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -352,7 +362,7 @@ body {
                   <span class="mi-icon danger"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3.5 1.8 20.5h20.4L12 3.5z"/><line x1="12" y1="10" x2="12" y2="15"/><circle cx="12" cy="17.6" r="0.4" fill="currentColor"/></svg></span>
                   <div class="mi-main">
                     <div class="mi-name">完全访问</div>
-                    <div class="mi-desc">减少确认步骤，建议仅在信任的工作区开启</div>
+                    <div class="mi-desc">减少确认步骤，对所有任务生效，建议用完即关</div>
                   </div>
                   <span class="mi-check"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4.5 12.5l5 5 10-11"/></svg></span>
                 </div>
@@ -436,11 +446,20 @@ body {
 
 <div class="overlay" id="overlay">
   <div class="modal">
-    <h3>切换到完全访问？</h3>
-    <p>完全访问模式下，KerWork 将减少操作确认步骤，并可执行更多文件和系统操作。建议仅在你信任当前工作区时开启。</p>
+    <h3>确认允许完全访问？</h3>
+    <p>开启完全访问后，所有任务将减少确认步骤并直接操作您的电脑，请谨慎操作。包括：</p>
+    <ul class="cap-list">
+      <li><b>文件操作</b>：读取、创建、修改、上传或删除此计算机上任意位置的文件</li>
+      <li><b>终端命令</b>：运行命令、安装软件和更改系统设置</li>
+      <li><b>访问互联网</b>：访问网站、发送数据并使用已启用的连接器</li>
+    </ul>
+    <label class="risk-check">
+      <input type="checkbox" id="riskAck">
+      <span>我已了解风险，并对自己的数据安全负责</span>
+    </label>
     <div class="modal-actions">
       <button class="btn-cancel" id="cancelBtn">取消</button>
-      <button class="btn-confirm" id="confirmBtn">确认切换</button>
+      <button class="btn-confirm" id="confirmBtn" disabled>确认切换</button>
     </div>
   </div>
 </div>
@@ -546,8 +565,8 @@ body {
     <h3>KerWork 请求执行操作</h3>
     <div class="op-detail">
       <div class="op-line"><span class="op-label">操作</span>删除文件</div>
-      <div class="op-line"><span class="op-label">目标</span>report-draft-old.pptx（任务中间产物）</div>
-      <div class="op-line"><span class="op-label">来源</span>当前任务：年终汇报 PPT 生成</div>
+      <div class="op-line"><span class="op-label">影响范围</span>report-draft-old.pptx（任务中间产物）</div>
+      <div class="op-line"><span class="op-label">执行理由</span>生成新版汇报 PPT 前需移除旧版草稿</div>
     </div>
     <p class="op-note">该操作由 AI 在执行任务时发起，删除后无法从应用内恢复。拒绝后任务将继续，KerWork 会改用其他方式完成。</p>
     <div class="op-actions">
@@ -650,18 +669,32 @@ function applyPerm(full) {
   permIcon.innerHTML = full ? alertSvg : shieldSvg;
 }
 
-document.getElementById('cancelBtn').addEventListener('click', () => overlay.classList.remove('show'));
+const riskAck = document.getElementById('riskAck');
+const confirmBtn = document.getElementById('confirmBtn');
+riskAck.addEventListener('change', () => {
+  confirmBtn.disabled = !riskAck.checked;
+});
+function resetPermModal() {
+  riskAck.checked = false;
+  confirmBtn.disabled = true;
+}
+
+document.getElementById('cancelBtn').addEventListener('click', () => {
+  resetPermModal();
+  overlay.classList.remove('show');
+});
 document.getElementById('confirmBtn').addEventListener('click', () => {
   applyPerm(true);
+  resetPermModal();
   overlay.classList.remove('show');
 });
 overlay.addEventListener('click', (e) => {
-  if (e.target === overlay) overlay.classList.remove('show');
+  if (e.target === overlay) { resetPermModal(); overlay.classList.remove('show'); }
 });
 
 document.addEventListener('click', closeMenus);
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') { closeMenus(); overlay.classList.remove('show'); settingsPage.classList.remove('show'); opConfirmOverlay.classList.remove('show'); }
+  if (e.key === 'Escape') { closeMenus(); resetPermModal(); overlay.classList.remove('show'); settingsPage.classList.remove('show'); opConfirmOverlay.classList.remove('show'); }
 });
 
 taskInput.addEventListener('input', () => {
