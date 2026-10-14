@@ -150,10 +150,11 @@ body {
 /* ---------- 原型演示控制 ---------- */
 .demo-ctrl {
   position: fixed; left: 16px; bottom: 16px; z-index: 60;
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(255,255,255,.94); border: 1px dashed #c9c9c4; border-radius: 999px;
-  padding: 7px 12px; font-size: 12px; color: #6f6f6b;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+  background: rgba(255,255,255,.94); border: 1px dashed #c9c9c4; border-radius: 12px;
+  padding: 9px 12px; font-size: 12px; color: #6f6f6b;
 }
+.demo-row { display: flex; align-items: center; gap: 8px; }
 .demo-tag { background: #efefec; border-radius: 4px; padding: 1px 6px; font-size: 11px; color: #6f6f6b; }
 .switch { position: relative; display: inline-flex; }
 .switch input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; z-index: 1; }
@@ -224,6 +225,24 @@ body {
 .pager button { background: none; border: none; color: #4a4a46; cursor: pointer; font-size: 13px; padding: 4px 10px; border-radius: 6px; }
 .pager button:hover { background: #f3f3f1; }
 .pager button:disabled { color: #c9c9c4; cursor: default; background: none; }
+
+/* ---------- 任务内操作确认 ---------- */
+.op-modal { width: 470px; text-align: left; }
+.op-modal h3 { text-align: center; }
+.op-detail { margin-top: 16px; background: #f7f7f5; border-radius: 10px; padding: 12px 14px; }
+.op-line { font-size: 13px; color: #2b2b2b; line-height: 1.7; }
+.op-label {
+  display: inline-block; min-width: 34px; color: #9a9a96; font-size: 12px; margin-right: 6px;
+}
+.op-note { margin-top: 12px !important; font-size: 12.5px; color: #6f6f6b; }
+.op-actions { display: flex; gap: 8px; margin-top: 20px; }
+.op-actions button { padding: 9px 0; border-radius: 8px; font-size: 13.5px; cursor: pointer; border: none; }
+.op-deny { flex: 0.8; background: #f3f3f1; color: #3c3c38; }
+.op-deny:hover { background: #ececea; }
+.op-allow-task { flex: 1.6; background: #fff; color: #4553ff; border: 1px solid #c9cdff !important; }
+.op-allow-task:hover { background: #f5f6ff; }
+.op-allow { flex: 0.8; background: #4553ff; color: #fff; }
+.op-allow:hover { background: #3a46e6; }
 
 /* ---------- 输入区下方 ---------- */
 .workspace-chip {
@@ -522,13 +541,39 @@ body {
   </main>
 </div>
 
+<div class="overlay" id="opConfirmOverlay">
+  <div class="modal op-modal">
+    <h3>KerWork 请求执行操作</h3>
+    <div class="op-detail">
+      <div class="op-line"><span class="op-label">操作</span>删除文件</div>
+      <div class="op-line"><span class="op-label">目标</span>report-draft-old.pptx（任务中间产物）</div>
+      <div class="op-line"><span class="op-label">来源</span>当前任务：年终汇报 PPT 生成</div>
+    </div>
+    <p class="op-note">该操作由 AI 在执行任务时发起，删除后无法从应用内恢复。拒绝后任务将继续，KerWork 会改用其他方式完成。</p>
+    <div class="op-actions">
+      <button class="op-deny" id="opDeny">拒绝</button>
+      <button class="op-allow-task" id="opAllowTask">允许且本任务不再询问</button>
+      <button class="op-allow" id="opAllow">允许</button>
+    </div>
+  </div>
+</div>
+
 <div class="demo-ctrl">
-  <span class="demo-tag">原型演示</span>
-  <label class="switch">
-    <input type="checkbox" id="fastUnavailable" checked>
-    <span class="switch-track"></span>
-  </label>
-  <span>极速档不可用</span>
+  <div class="demo-row">
+    <span class="demo-tag">原型演示</span>
+    <label class="switch">
+      <input type="checkbox" id="fastUnavailable" checked>
+      <span class="switch-track"></span>
+    </label>
+    <span>极速档不可用</span>
+  </div>
+  <div class="demo-row">
+    <label class="switch">
+      <input type="checkbox" id="opConfirmDemo">
+      <span class="switch-track"></span>
+    </label>
+    <span>任务内确认示例</span>
+  </div>
 </div>
 
 <script>
@@ -541,6 +586,7 @@ const permLabel = document.getElementById('permLabel');
 const permIcon = document.getElementById('permIcon');
 const overlay = document.getElementById('overlay');
 const settingsPage = document.getElementById('settingsPage');
+const opConfirmOverlay = document.getElementById('opConfirmOverlay');
 const taskInput = document.getElementById('taskInput');
 const sendBtn = document.getElementById('sendBtn');
 
@@ -615,7 +661,7 @@ overlay.addEventListener('click', (e) => {
 
 document.addEventListener('click', closeMenus);
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') { closeMenus(); overlay.classList.remove('show'); settingsPage.classList.remove('show'); }
+  if (e.key === 'Escape') { closeMenus(); overlay.classList.remove('show'); settingsPage.classList.remove('show'); opConfirmOverlay.classList.remove('show'); }
 });
 
 taskInput.addEventListener('input', () => {
@@ -634,6 +680,16 @@ document.getElementById('settingsBtn').addEventListener('click', () => {
 });
 document.getElementById('settingsBack').addEventListener('click', () => {
   settingsPage.classList.remove('show');
+});
+
+const opConfirmDemo = document.getElementById('opConfirmDemo');
+opConfirmDemo.addEventListener('change', () => {
+  opConfirmOverlay.classList.toggle('show', opConfirmDemo.checked);
+});
+['opDeny', 'opAllow', 'opAllowTask'].forEach((id) => {
+  document.getElementById(id).addEventListener('click', () => {
+    opConfirmOverlay.classList.remove('show');
+  });
 });
 </script>
 </body>
