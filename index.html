@@ -226,24 +226,6 @@ body {
 .pager button:hover { background: #f3f3f1; }
 .pager button:disabled { color: #c9c9c4; cursor: default; background: none; }
 
-/* ---------- 任务内操作确认 ---------- */
-.op-modal { width: 470px; text-align: left; }
-.op-modal h3 { text-align: center; }
-.op-detail { margin-top: 16px; background: #f7f7f5; border-radius: 10px; padding: 12px 14px; }
-.op-line { font-size: 13px; color: #2b2b2b; line-height: 1.7; }
-.op-label {
-  display: inline-block; min-width: 34px; color: #9a9a96; font-size: 12px; margin-right: 6px;
-}
-.op-note { margin-top: 12px !important; font-size: 12.5px; color: #6f6f6b; }
-.op-actions { display: flex; gap: 8px; margin-top: 20px; }
-.op-actions button { padding: 9px 0; border-radius: 8px; font-size: 13.5px; cursor: pointer; border: none; }
-.op-deny { flex: 0.8; background: #f3f3f1; color: #3c3c38; }
-.op-deny:hover { background: #ececea; }
-.op-allow-task { flex: 1.6; background: #fff; color: #4553ff; border: 1px solid #c9cdff !important; }
-.op-allow-task:hover { background: #f5f6ff; }
-.op-allow { flex: 0.8; background: #4553ff; color: #fff; }
-.op-allow:hover { background: #3a46e6; }
-
 /* ---------- 输入区下方 ---------- */
 .workspace-chip {
   margin-top: 14px; margin-left: 4px; display: inline-flex; align-items: center; gap: 7px;
@@ -362,7 +344,7 @@ body {
                 <div class="menu-item" data-perm="full">
                   <span class="mi-icon danger"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3.5 1.8 20.5h20.4L12 3.5z"/><line x1="12" y1="10" x2="12" y2="15"/><circle cx="12" cy="17.6" r="0.4" fill="currentColor"/></svg></span>
                   <div class="mi-main">
-                    <div class="mi-name">完全访问</div>
+                    <div class="mi-name">替我审批</div>
                     <div class="mi-desc">高危操作免确认，对所有任务生效，建议用完即关</div>
                   </div>
                   <span class="mi-check"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4.5 12.5l5 5 10-11"/></svg></span>
@@ -447,8 +429,8 @@ body {
 
 <div class="overlay" id="overlay">
   <div class="modal">
-    <h3>确认允许完全访问？</h3>
-    <p>开启完全访问后，以下操作将不再逐次确认，对所有任务生效，请谨慎操作：</p>
+    <h3>确认开启替我审批？</h3>
+    <p>开启替我审批后，以下操作将不再逐次确认，对所有任务生效，请谨慎操作：</p>
     <ul class="cap-list">
       <li><b>文件操作</b>：删除文件 / 文件夹、清空目录、批量删除</li>
       <li><b>安装与系统更改</b>：安装 / 卸载依赖、修改系统设置、环境变量与系统服务</li>
@@ -561,23 +543,6 @@ body {
   </main>
 </div>
 
-<div class="overlay" id="opConfirmOverlay">
-  <div class="modal op-modal">
-    <h3>KerWork 请求执行操作</h3>
-    <div class="op-detail">
-      <div class="op-line"><span class="op-label">操作</span>删除文件</div>
-      <div class="op-line"><span class="op-label">影响范围</span>report-draft-old.pptx（任务中间产物）</div>
-      <div class="op-line"><span class="op-label">执行理由</span>生成新版汇报 PPT 前需移除旧版草稿</div>
-    </div>
-    <p class="op-note">该操作由 AI 在执行任务时发起，删除后无法从应用内恢复。拒绝后任务将继续，KerWork 会改用其他方式完成。</p>
-    <div class="op-actions">
-      <button class="op-deny" id="opDeny">拒绝</button>
-      <button class="op-allow-task" id="opAllowTask">允许且本任务不再询问</button>
-      <button class="op-allow" id="opAllow">允许</button>
-    </div>
-  </div>
-</div>
-
 <div class="demo-ctrl">
   <div class="demo-row">
     <span class="demo-tag">原型演示</span>
@@ -586,13 +551,6 @@ body {
       <span class="switch-track"></span>
     </label>
     <span>极速档不可用</span>
-  </div>
-  <div class="demo-row">
-    <label class="switch">
-      <input type="checkbox" id="opConfirmDemo">
-      <span class="switch-track"></span>
-    </label>
-    <span>任务内确认示例</span>
   </div>
 </div>
 
@@ -606,7 +564,6 @@ const permLabel = document.getElementById('permLabel');
 const permIcon = document.getElementById('permIcon');
 const overlay = document.getElementById('overlay');
 const settingsPage = document.getElementById('settingsPage');
-const opConfirmOverlay = document.getElementById('opConfirmOverlay');
 const taskInput = document.getElementById('taskInput');
 const sendBtn = document.getElementById('sendBtn');
 
@@ -666,7 +623,7 @@ function applyPerm(full) {
     i.classList.toggle('selected', (i.dataset.perm === 'full') === full);
   });
   permSelector.classList.toggle('elevated', full);
-  permLabel.textContent = full ? '完全访问' : '请求批准';
+  permLabel.textContent = full ? '替我审批' : '请求批准';
   permIcon.innerHTML = full ? alertSvg : shieldSvg;
 }
 
@@ -695,7 +652,7 @@ overlay.addEventListener('click', (e) => {
 
 document.addEventListener('click', closeMenus);
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') { closeMenus(); resetPermModal(); overlay.classList.remove('show'); settingsPage.classList.remove('show'); opConfirmOverlay.classList.remove('show'); }
+  if (e.key === 'Escape') { closeMenus(); resetPermModal(); overlay.classList.remove('show'); settingsPage.classList.remove('show'); }
 });
 
 taskInput.addEventListener('input', () => {
@@ -714,16 +671,6 @@ document.getElementById('settingsBtn').addEventListener('click', () => {
 });
 document.getElementById('settingsBack').addEventListener('click', () => {
   settingsPage.classList.remove('show');
-});
-
-const opConfirmDemo = document.getElementById('opConfirmDemo');
-opConfirmDemo.addEventListener('change', () => {
-  opConfirmOverlay.classList.toggle('show', opConfirmDemo.checked);
-});
-['opDeny', 'opAllow', 'opAllowTask'].forEach((id) => {
-  document.getElementById(id).addEventListener('click', () => {
-    opConfirmOverlay.classList.remove('show');
-  });
 });
 </script>
 </body>
