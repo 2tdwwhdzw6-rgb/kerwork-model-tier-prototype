@@ -266,12 +266,155 @@ body {
 .cap-list { margin: 12px 0 0; padding-left: 20px; text-align: left; list-style: disc; }
 .cap-list li { font-size: 12.5px; color: #6f6f6b; line-height: 1.8; }
 .cap-list li b { color: #3c3c38; font-weight: 500; }
-.risk-check {
-  display: flex; align-items: center; gap: 7px; margin-top: 14px;
-  font-size: 12.5px; color: #3c3c38; cursor: pointer; text-align: left;
-}
-.risk-check input { accent-color: #d5493a; width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; }
 .cap-note { margin-top: 10px; font-size: 11.5px; color: #9a9a96; text-align: left; }
+.risk-check {
+  display: flex; align-items: flex-start; gap: 7px; margin-top: 14px;
+  font-size: 12.5px; color: #3c3c38; cursor: pointer; text-align: left; line-height: 1.6;
+}
+.risk-check input { accent-color: #d5493a; width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; margin-top: 1px; }
+
+/* ---------- 对话演示视图 ---------- */
+.chat-view { position: absolute; inset: 0; background: #fff; display: none; flex-direction: column; z-index: 10; }
+.chat-view.show { display: flex; }
+.chat-head {
+  height: 56px; flex-shrink: 0; display: flex; align-items: center; gap: 12px;
+  padding: 0 20px; border-bottom: 1px solid #f0f0ee; position: relative;
+}
+.chat-title { font-size: 15px; font-weight: 600; color: #1f1f1f; }
+.chat-back {
+  background: none; border: none; cursor: pointer; color: #6f6f6b;
+  padding: 6px; border-radius: 8px; display: flex; margin-left: -6px;
+}
+.chat-back:hover { background: #f3f3f1; }
+.chat-replay {
+  margin-left: auto; background: none; border: 1px solid #e7e7e4; border-radius: 8px;
+  padding: 5px 12px; font-size: 12.5px; color: #6f6f6b; cursor: pointer;
+}
+.chat-replay:hover { color: #1f1f1f; border-color: #d9d9d5; }
+.chat-banner {
+  position: absolute; top: 12px; right: 20px; z-index: 5;
+  display: none; align-items: center; gap: 8px; cursor: pointer;
+  background: #fdf3e7; color: #b45309; font-size: 12.5px;
+  padding: 7px 14px; border-radius: 9px; white-space: nowrap;
+}
+.chat-banner.show { display: flex; animation: fadeUp .3s ease; }
+.chat-banner .dot { width: 6px; height: 6px; border-radius: 50%; background: #b45309; }
+.chat-banner b { font-weight: 600; }
+.chat-scroll { flex: 1; overflow-y: auto; padding: 24px 40px 12px; }
+.chat-scroll .inner { max-width: 760px; margin: 0 auto; }
+.msg { animation: fadeUp .35s ease; margin-bottom: 18px; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.user-row { display: flex; justify-content: flex-end; }
+.bubble-user {
+  background: #2b2b2b; color: #fff; font-size: 14px; line-height: 1.6;
+  padding: 10px 16px; border-radius: 14px; max-width: 72%;
+}
+.agent { max-width: 88%; }
+.thinking-label { font-size: 13px; color: #6f6f6b; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; user-select: none; }
+.thinking-label .arr { font-size: 10px; color: #a0a09a; transition: transform .2s; }
+.thinking-label.open .arr { transform: rotate(180deg); }
+.thinking-body {
+  margin-top: 8px; background: #f7f7f5; border-left: 3px solid #e7e7e4;
+  border-radius: 4px 10px 10px 4px; padding: 10px 14px;
+  font-size: 13px; line-height: 1.75; color: #6f6f6b;
+}
+.thinking-body.hide { display: none; }
+.thinking-body b { color: #3c3c38; }
+.status-line { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: #6f6f6b; margin-bottom: 18px; animation: fadeUp .3s ease; }
+.status-line .kerker { font-weight: 600; color: #1f1f1f; }
+.spinner {
+  width: 14px; height: 14px; flex: none; border: 2px solid #e2e2df;
+  border-top-color: #8a8a86; border-radius: 50%; animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.status-line .ok-ic { color: #15803d; font-weight: 700; }
+/* 专家自动切换卡片：通知即生效，无撤销 */
+.switch-card {
+  background: #f7f8ff; border: 1px solid #dfe3ff; border-radius: 14px;
+  padding: 14px 16px; margin-bottom: 18px; max-width: 600px; animation: fadeUp .35s ease;
+}
+.switch-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.exp-chip {
+  display: inline-flex; align-items: center; gap: 7px; background: #fff;
+  border: 1px solid #ececea; border-radius: 20px; padding: 5px 12px 5px 6px;
+  font-size: 13px; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+.exp-chip.dim { opacity: .5; }
+.exp-chip .ava { width: 24px; height: 24px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.ava-blue { background: #e8ecff; } .ava-orange { background: #fdeeda; }
+.switch-arrow { color: #4553ff; font-size: 16px; font-weight: 700; display: inline-flex; align-items: center; }
+.switch-tag { margin-left: auto; font-size: 11.5px; color: #4553ff; background: #eef0ff; padding: 3px 9px; border-radius: 6px; white-space: nowrap; }
+.switch-msg { font-size: 13.5px; line-height: 1.7; color: #1f1f1f; }
+.switch-msg .hl { color: #4553ff; font-weight: 600; }
+.switch-reason {
+  margin-top: 10px; font-size: 12.5px; line-height: 1.7; color: #6f6f6b;
+  background: #fff; border: 1px dashed #c5cdff; border-radius: 8px;
+  padding: 9px 12px; display: none;
+}
+.switch-reason.show { display: block; animation: fadeUp .25s ease; }
+.switch-actions { margin-top: 11px; }
+.link-btn { border: none; background: none; font-size: 13px; color: #4553ff; cursor: pointer; padding: 0; }
+.link-btn:hover { text-decoration: underline; }
+.risk-auto {
+  display: flex; align-items: flex-start; gap: 8px; background: #eef8ee;
+  border: 1px solid #d3ecd2; border-radius: 10px; padding: 9px 13px;
+  font-size: 12.5px; line-height: 1.6; color: #2f6b33;
+  max-width: 600px; margin-bottom: 18px; animation: fadeUp .3s ease;
+}
+.risk-auto b { font-weight: 600; }
+.confirm-card {
+  background: #fff; border: 1px solid #f3d3b8; border-radius: 14px;
+  padding: 15px 17px; max-width: 600px; margin-bottom: 18px;
+  box-shadow: 0 2px 10px rgba(180,83,9,.05); animation: fadeUp .35s ease;
+}
+.confirm-card.redline { border-color: #f2c4c0; box-shadow: 0 2px 10px rgba(213,73,58,.07); }
+.confirm-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.confirm-head .t { font-size: 14px; font-weight: 600; }
+.op-tag { font-size: 11px; padding: 2px 8px; border-radius: 5px; font-weight: 600; }
+.op-tag.red { color: #d5493a; background: #fbeae8; }
+.op-tag.orange { color: #b45309; background: #fdf3e7; }
+.confirm-desc { font-size: 13px; line-height: 1.7; color: #6f6f6b; }
+.confirm-desc .op { color: #1f1f1f; font-weight: 500; }
+.confirm-note { font-size: 12px; color: #9a9a96; margin-top: 6px; }
+.confirm-actions { margin-top: 13px; display: flex; gap: 10px; }
+.cbtn { border-radius: 8px; font-size: 13px; padding: 7px 18px; cursor: pointer; border: 1px solid #e7e7e4; background: #fff; color: #3c3c38; transition: all .15s; }
+.cbtn:hover { border-color: #d9d9d5; color: #1f1f1f; }
+.cbtn.primary { background: #2b2b2b; border-color: #2b2b2b; color: #fff; }
+.cbtn.primary:hover { background: #000; }
+.cbtn.primary.red { background: #d5493a; border-color: #d5493a; }
+.confirm-result { margin-top: 10px; font-size: 12.5px; color: #9a9a96; animation: fadeUp .25s ease; }
+.rec-card {
+  background: #fff; border: 1px solid #ececea; border-radius: 14px;
+  padding: 16px 18px; max-width: 480px; margin-bottom: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.05); animation: fadeUp .35s ease;
+}
+.rec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.rec-head .ava { width: 34px; height: 34px; border-radius: 9px; background: #e8ecff; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.rec-head .name { font-size: 14.5px; font-weight: 600; }
+.rec-head .sub { font-size: 12px; color: #9a9a96; margin-top: 1px; }
+.rec-desc { font-size: 13px; line-height: 1.7; color: #6f6f6b; margin-bottom: 14px; }
+.rec-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.rec-actions .cbtn { padding: 8px 22px; }
+.done-bubble {
+  background: #f7f7f5; border: 1px solid #ececea; border-radius: 14px;
+  padding: 13px 16px; max-width: 600px; font-size: 13.5px; line-height: 1.75;
+  animation: fadeUp .35s ease; margin-bottom: 18px;
+}
+.done-bubble .t { font-weight: 600; margin-bottom: 4px; }
+.done-bubble .meta { font-size: 12px; color: #9a9a96; margin-top: 8px; display: flex; gap: 14px; flex-wrap: wrap; }
+.chat-composer {
+  flex-shrink: 0; margin: 0 40px 18px; max-width: 760px; width: calc(100% - 80px);
+  align-self: center; border: 1px solid #ececea; border-radius: 14px;
+  padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.03);
+}
+.chat-composer .ph { flex: 1; color: #b9b9b5; font-size: 13.5px; }
+.chat-perm-chip {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+  padding: 5px 12px; border-radius: 999px; border: 1px solid #e7e7e4; color: #3c3c38; white-space: nowrap;
+}
+.chat-perm-chip.on-behalf { color: #d5493a; border-color: #f2c4c0; background: #fbeae8; font-weight: 600; animation: pulse 2s ease infinite; }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(213,73,58,0); } 50% { box-shadow: 0 0 0 4px rgba(213,73,58,.08); } }
 </style>
 </head>
 <body>
@@ -425,24 +568,46 @@ body {
       </div>
     </div>
   </main>
+
+  <div class="chat-view" id="chatView">
+    <div class="chat-head">
+      <button class="chat-back" id="chatBack" title="返回首页">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+      <span class="chat-title">新任务</span>
+      <button class="chat-replay" id="chatReplay">↺ 重播</button>
+      <div class="chat-banner" id="chatBanner">
+        <span class="dot"></span><b>有任务正在等待你的确认</b><span>去查看 ›</span>
+      </div>
+    </div>
+    <div class="chat-scroll" id="chatScroll"><div class="inner" id="chatInner"></div></div>
+    <div class="chat-composer">
+      <span class="ph">KerWork会在你电脑里自动查找并完成，@引用附件</span>
+      <span class="chat-perm-chip" id="chatPermChip">请求批准</span>
+    </div>
+  </div>
 </div>
 
 <div class="overlay" id="overlay">
   <div class="modal">
-    <h3>确认开启替我审批？</h3>
-    <p>开启替我审批后，以下操作将不再逐次确认，对所有任务生效，请谨慎操作：</p>
+    <h3>开启替我审批？</h3>
+    <p>开启后，Agent 将在当前工作区自主推进后续任务，并根据任务目标、操作影响和安全规则做出判断：</p>
     <ul class="cap-list">
-      <li><b>文件操作</b>：删除文件 / 文件夹、清空目录、批量删除</li>
-      <li><b>安装与系统更改</b>：安装 / 卸载依赖、修改系统设置、环境变量与系统服务</li>
+      <li>自动执行符合任务目标的低风险操作</li>
+      <li>根据任务需要选择合适的专家、工具和执行方式</li>
+      <li>安装、卸载及系统操作遵循你的明确指令</li>
+      <li>删除、清空、破坏性覆盖等操作先进行风险评估</li>
+      <li>高风险、红线或无法判断的操作暂停并请求确认</li>
+      <li>通过对话说明关键判断和执行进展</li>
     </ul>
-    <p class="cap-note">任务所需脚本自主执行；读取与网络访问不受档位限制；清空系统目录、磁盘级不可逆操作仍需确认。</p>
+    <p class="cap-note">范围说明：当前模式仅对本工作区生效，关闭后恢复逐次确认。</p>
     <label class="risk-check">
-      <input type="checkbox" id="riskAck">
-      <span>我已了解风险，并对自己的数据安全负责</span>
+      <input type="checkbox" id="riskAck" checked>
+      <span>我了解 Agent 将代我处理低风险决策，并在高风险或无法判断时请求确认</span>
     </label>
     <div class="modal-actions">
       <button class="btn-cancel" id="cancelBtn">取消</button>
-      <button class="btn-confirm" id="confirmBtn" disabled>确认切换</button>
+      <button class="btn-confirm" id="confirmBtn">确认切换</button>
     </div>
   </div>
 </div>
@@ -566,6 +731,7 @@ const overlay = document.getElementById('overlay');
 const settingsPage = document.getElementById('settingsPage');
 const taskInput = document.getElementById('taskInput');
 const sendBtn = document.getElementById('sendBtn');
+let permFull = false;
 
 const shieldSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8-7.5 9.5-4.3-1.5-7.5-4.9-7.5-9.5V6L12 3z"/></svg>';
 const alertSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3.5 1.8 20.5h20.4L12 3.5z"/><line x1="12" y1="10" x2="12" y2="15"/><circle cx="12" cy="17.6" r="0.4" fill="currentColor"/></svg>';
@@ -619,6 +785,7 @@ permMenu.querySelectorAll('.menu-item').forEach((item) => {
 });
 
 function applyPerm(full) {
+  permFull = full;
   permMenu.querySelectorAll('.menu-item').forEach((i) => {
     i.classList.toggle('selected', (i.dataset.perm === 'full') === full);
   });
@@ -633,8 +800,8 @@ riskAck.addEventListener('change', () => {
   confirmBtn.disabled = !riskAck.checked;
 });
 function resetPermModal() {
-  riskAck.checked = false;
-  confirmBtn.disabled = true;
+  riskAck.checked = true;
+  confirmBtn.disabled = false;
 }
 
 document.getElementById('cancelBtn').addEventListener('click', () => {
@@ -652,7 +819,7 @@ overlay.addEventListener('click', (e) => {
 
 document.addEventListener('click', closeMenus);
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') { closeMenus(); resetPermModal(); overlay.classList.remove('show'); settingsPage.classList.remove('show'); }
+  if (e.key === 'Escape') { closeMenus(); overlay.classList.remove('show'); settingsPage.classList.remove('show'); }
 });
 
 taskInput.addEventListener('input', () => {
@@ -672,6 +839,282 @@ document.getElementById('settingsBtn').addEventListener('click', () => {
 document.getElementById('settingsBack').addEventListener('click', () => {
   settingsPage.classList.remove('show');
 });
+
+/* ================= 对话演示：专家自动切换 ================= */
+const chatView = document.getElementById('chatView');
+const chatInner = document.getElementById('chatInner');
+const chatScroll = document.getElementById('chatScroll');
+const chatBanner = document.getElementById('chatBanner');
+const chatPermChip = document.getElementById('chatPermChip');
+let chatTimers = [];
+
+function chatEl(html) {
+  const d = document.createElement('div');
+  d.innerHTML = html.trim();
+  return d.firstElementChild;
+}
+function chatAppend(node) {
+  chatInner.appendChild(node);
+  chatScroll.scrollTop = chatScroll.scrollHeight;
+  return node;
+}
+function chatSchedule(steps) {
+  let t = 400;
+  steps.forEach((s) => { t += s.d; chatTimers.push(setTimeout(s.fn, t)); });
+}
+function chatClear() {
+  chatTimers.forEach(clearTimeout);
+  chatTimers = [];
+  chatInner.innerHTML = '';
+  chatBanner.classList.remove('show');
+}
+function chatAddUser(text) {
+  chatAppend(chatEl(`<div class="msg user-row"><div class="bubble-user">${text}</div></div>`));
+}
+function chatAddThinking(text) {
+  const node = chatEl(`
+    <div class="msg agent">
+      <span class="thinking-label open">深度思考 <span class="arr">▾</span></span>
+      <div class="thinking-body">${text}</div>
+    </div>`);
+  node.querySelector('.thinking-label').addEventListener('click', () => {
+    node.querySelector('.thinking-body').classList.toggle('hide');
+    node.querySelector('.thinking-label').classList.toggle('open');
+  });
+  chatAppend(node);
+}
+function chatAddStatus(html) {
+  return chatAppend(chatEl(`<div class="status-line"><span class="spinner"></span><span>${html}</span></div>`));
+}
+function chatResolve(node, okText) {
+  node.querySelector('.spinner').outerHTML = '<span class="ok-ic">✓</span>';
+  node.querySelector('span:last-child').innerHTML = okText;
+}
+function enterChat(text) {
+  closeMenus();
+  chatView.classList.add('show');
+  chatClear();
+  chatPermChip.textContent = permFull ? '替我审批 · 已开启' : '请求批准';
+  chatPermChip.classList.toggle('on-behalf', permFull);
+  if (permFull) playBehalf(text); else playAsk(text);
+}
+function exitChat() {
+  chatClear();
+  chatView.classList.remove('show');
+}
+document.getElementById('chatBack').addEventListener('click', exitChat);
+document.getElementById('chatReplay').addEventListener('click', () => {
+  chatClear();
+  if (permFull) playBehalf(lastTask); else playAsk(lastTask);
+});
+chatBanner.addEventListener('click', () => {
+  chatScroll.scrollTo({ top: chatScroll.scrollHeight, behavior: 'smooth' });
+});
+
+let lastTask = '';
+sendBtn.addEventListener('click', () => {
+  const text = taskInput.value.trim();
+  if (!text) return;
+  lastTask = text;
+  taskInput.value = '';
+  sendBtn.classList.remove('active');
+  enterChat(text);
+});
+taskInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.isComposing) {
+    e.preventDefault();
+    sendBtn.click();
+  }
+});
+document.querySelectorAll('.chip').forEach((chip) => {
+  chip.addEventListener('click', () => {
+    lastTask = chip.textContent.trim();
+    enterChat(lastTask);
+  });
+});
+
+/* ---- 替我审批：自动切换，通知即生效，无撤销 ---- */
+function chatAddSwitchCard() {
+  const node = chatEl(`
+    <div class="switch-card">
+      <div class="switch-head">
+        <span class="exp-chip dim"><span class="ava ava-orange">📊</span>数据分析专家</span>
+        <span class="switch-arrow">→</span>
+        <span class="exp-chip"><span class="ava ava-blue">🖥️</span>PPT 设计师</span>
+        <span class="switch-tag">替我审批 · 自动切换</span>
+      </div>
+      <div class="switch-msg">
+        当前任务主要是汇报型 PPT，我已切换到<span class="hl">「PPT 设计师」</span>继续处理，前面的数据分析结果会继续沿用。
+      </div>
+      <div class="switch-reason">
+        匹配度评估：任务目标为「汇报型 PPT」，核心能力是 PPT 结构与页面设计；当前「数据分析专家」擅长数据探查与建模，匹配度较低。
+        替我审批模式下系统直接切换、无需等待确认；原始分析材料与结论全部保留并传入新专家。
+      </div>
+      <div class="switch-actions">
+        <button class="link-btn">查看原因</button>
+      </div>
+    </div>`);
+  node.querySelector('.link-btn').addEventListener('click', () => {
+    node.querySelector('.switch-reason').classList.toggle('show');
+  });
+  chatAppend(node);
+}
+function chatAddRiskAuto() {
+  chatAppend(chatEl(`
+    <div class="risk-auto">
+      <span>✓</span>
+      <span><b>清理 3 个临时草稿文件</b> · 风险评估：低风险且明确可逆（回收站可恢复）→ 符合替我审批规则，<b>已自动执行</b></span>
+    </div>`));
+}
+function chatAddRedlineConfirm() {
+  chatBanner.classList.add('show');
+  const node = chatEl(`
+    <div class="confirm-card redline">
+      <div class="confirm-head">
+        <span class="t">等待确认</span>
+        <span class="op-tag red">红线操作</span>
+      </div>
+      <div class="confirm-desc">
+        检测到操作：<span class="op">修改登录启动项</span>（以便开机自动同步分析数据）。
+        无论权限模式如何，红线操作始终需要你确认。
+      </div>
+      <div class="confirm-note">替我审批不会扩大红线权限 · 目标：系统设置 · 影响范围：登录项</div>
+      <div class="confirm-actions">
+        <button class="cbtn" data-a="deny">暂不执行</button>
+        <button class="cbtn primary red" data-a="allow">开始执行</button>
+      </div>
+    </div>`);
+  chatAppend(node);
+  node.querySelectorAll('.cbtn').forEach((b) => b.addEventListener('click', () => {
+    const allow = b.dataset.a === 'allow';
+    node.querySelector('.confirm-actions').remove();
+    chatAppend(chatEl(`<div class="confirm-result">${allow ? '✓ 已确认执行启动项修改' : '已拒绝该操作，不影响 PPT 生成'}</div>`));
+    chatBanner.classList.remove('show');
+    chatSchedule([
+      { d: 500, fn: () => { window._c1 = chatAddStatus('生成页面 4/10…'); } },
+      { d: 1400, fn: () => { chatResolve(window._c1, '生成页面 10/10 完成'); } },
+      { d: 700, fn: () => chatAddDone('专家：PPT 设计师（自动切换）', '模式：替我审批', '自动执行 1 项低风险操作', '红线确认 1 次') },
+    ]);
+  }));
+}
+function chatAddDone(...metas) {
+  chatAppend(chatEl(`
+    <div class="done-bubble">
+      <div class="t">10 页汇报 PPT 已生成 ✅</div>
+      结构：封面 → 核心结论 → 3 个数据洞察 → 建议与下一步。
+      <div class="meta">${metas.map((m) => `<span>${m}</span>`).join('')}</div>
+    </div>`));
+}
+function playBehalf(task) {
+  chatSchedule([
+    { d: 200, fn: () => chatAddUser(task) },
+    { d: 700, fn: () => {
+        chatAddThinking('任务目标是交付一份「汇报型 PPT」，核心需要 PPT 结构与页面设计能力；当前专家「数据分析专家」与目标匹配度较低。当前处于<b>替我审批</b>模式，按规则可直接切换专家、无需等待确认，切换后告知用户即可。');
+        window._b1 = chatAddStatus('<span class="kerker">kerker</span> 眯起了眼睛');
+      } },
+    { d: 1600, fn: () => { chatResolve(window._b1, '已识别任务类型：汇报型 PPT'); } },
+    { d: 500, fn: chatAddSwitchCard },
+    { d: 1100, fn: () => { window._b2 = chatAddStatus('<span class="kerker">kerker</span> 竖起了耳朵'); } },
+    { d: 800, fn: () => { chatResolve(window._b2, 'kerker 竖起了耳朵'); window._b3 = chatAddStatus('正在准备专家运行环境…'); } },
+    { d: 1600, fn: () => { chatResolve(window._b3, '专家环境已就绪'); } },
+    { d: 700, fn: chatAddRiskAuto },
+    { d: 1100, fn: () => { window._b4 = chatAddStatus('梳理汇报结构：核心结论 → 数据洞察 → 行动建议'); } },
+    { d: 1500, fn: () => { chatResolve(window._b4, '汇报结构已确定（10 页）'); } },
+    { d: 700, fn: () => { window._b5 = chatAddStatus('生成页面 3/10…'); } },
+    { d: 1400, fn: chatAddRedlineConfirm },
+  ]);
+}
+
+/* ---- 请求批准：弹窗推荐，用户确认后切换 ---- */
+function playAsk(task) {
+  chatSchedule([
+    { d: 200, fn: () => chatAddUser(task) },
+    { d: 700, fn: () => {
+        chatAddThinking('任务目标是交付一份「汇报型 PPT」，核心需要 PPT 结构与页面设计能力；当前「数据分析专家」与目标匹配度较低，推荐切换到更合适的专家。');
+        window._a1 = chatAddStatus('<span class="kerker">kerker</span> 眯起了眼睛');
+      } },
+    { d: 1600, fn: () => { chatResolve(window._a1, '检测到更合适的专家，等待用户确认'); } },
+    { d: 600, fn: () => {
+        chatBanner.classList.add('show');
+        const node = chatEl(`
+          <div class="rec-card">
+            <div class="rec-head">
+              <span class="ava">🖥️</span>
+              <div>
+                <div class="name">PPT 设计师</div>
+                <div class="sub">汇报表达 · 结构梳理</div>
+              </div>
+            </div>
+            <div class="rec-desc">帮你把零散想法整理成结构清晰、拿去就能讲的 PPT；三页能讲清的事，绝不做三十页。</div>
+            <div class="rec-actions">
+              <button class="cbtn" data-a="skip">跳过 (20s)</button>
+              <button class="cbtn primary" data-a="enable">启用专家</button>
+            </div>
+          </div>`);
+        chatAppend(node);
+        node.querySelectorAll('.cbtn').forEach((b) => b.addEventListener('click', () => {
+          chatBanner.classList.remove('show');
+          node.querySelector('.rec-actions').remove();
+          if (b.dataset.a === 'enable') {
+            chatAppend(chatEl('<div class="confirm-result">✓ 已切换到「PPT 设计师」</div>'));
+            chatSchedule([
+              { d: 500, fn: () => { window._e1 = chatAddStatus('正在准备专家运行环境…'); } },
+              { d: 1500, fn: () => { chatResolve(window._e1, '专家环境已就绪'); } },
+              { d: 700, fn: () => { window._e2 = chatAddStatus('梳理汇报结构：核心结论 → 数据洞察 → 行动建议'); } },
+              { d: 1400, fn: () => { chatResolve(window._e2, '汇报结构已确定（10 页）'); } },
+              { d: 700, fn: chatAddAskDeleteConfirm },
+            ]);
+          } else {
+            chatAppend(chatEl('<div class="confirm-result">已跳过，继续使用「数据分析专家」完成任务</div>'));
+            chatSchedule([
+              { d: 600, fn: () => chatAddThinking('收到，继续使用「数据分析专家」。我会以数据汇报的思路组织这 10 页内容：先结论、后证据、再建议。') },
+              { d: 800, fn: () => { window._s1 = chatAddStatus('生成页面 5/10…'); } },
+              { d: 1500, fn: () => { chatResolve(window._s1, '生成页面 10/10 完成'); } },
+              { d: 700, fn: () => chatAddDone('专家：数据分析专家（未切换）') },
+            ]);
+          }
+        }));
+      } },
+  ]);
+}
+function chatAddAskDeleteConfirm() {
+  chatBanner.classList.add('show');
+  const node = chatEl(`
+    <div class="confirm-card">
+      <div class="confirm-head">
+        <span class="t">等待确认</span>
+        <span class="op-tag orange">需逐次确认</span>
+      </div>
+      <div class="confirm-desc">
+        检测到操作：<span class="op">删除 3 个临时草稿文件</span>。
+        请求批准模式下，删除类操作默认逐次请求确认。
+      </div>
+      <div class="confirm-note">目标：工作区临时目录 · 影响范围：3 个文件</div>
+      <div class="confirm-actions">
+        <button class="cbtn" data-a="deny">暂不执行</button>
+        <button class="cbtn primary" data-a="allow">开始执行</button>
+      </div>
+    </div>`);
+  chatAppend(node);
+  node.querySelectorAll('.cbtn').forEach((b) => b.addEventListener('click', () => {
+    chatBanner.classList.remove('show');
+    node.querySelector('.confirm-actions').remove();
+    chatAppend(chatEl(`<div class="confirm-result">${b.dataset.a === 'allow' ? '✓ 已执行删除' : '已跳过删除，不影响 PPT 生成'}</div>`));
+    chatSchedule([
+      { d: 500, fn: () => { window._g1 = chatAddStatus('生成页面 6/10…'); } },
+      { d: 1400, fn: () => { chatResolve(window._g1, '生成页面 10/10 完成'); } },
+      { d: 700, fn: () => chatAddDone('专家：PPT 设计师（你确认后启用）', '确认 2 次') },
+    ]);
+  }));
+}
+
+/* ---- 分享锚点：#behalf 预设替我审批；含 demo 自动进入对话演示 ---- */
+if (location.hash === '#behalf') applyPerm(true);
+if (location.hash.includes('demo')) {
+  if (location.hash.includes('behalf')) applyPerm(true);
+  lastTask = '帮我把这些分析结果整理成一份 10 页汇报 PPT';
+  setTimeout(() => enterChat(lastTask), 300);
+}
 </script>
 </body>
 </html>
