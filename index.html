@@ -289,6 +289,7 @@ body {
   font-size: 12.5px; color: #3c3c38; cursor: pointer; text-align: left;
 }
 .risk-check input { accent-color: #d5493a; width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; }
+.cap-note { margin-top: 10px; font-size: 11.5px; color: #9a9a96; text-align: left; }
 </style>
 </head>
 <body>
@@ -354,7 +355,7 @@ body {
                   <span class="mi-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8-7.5 9.5-4.3-1.5-7.5-4.9-7.5-9.5V6L12 3z"/></svg></span>
                   <div class="mi-main">
                     <div class="mi-name">默认权限</div>
-                    <div class="mi-desc">适合大多数任务，删除、覆盖等高风险操作会先询问你</div>
+                    <div class="mi-desc">读取与内容生成不受限，删除、执行命令、系统更改会先询问你</div>
                   </div>
                   <span class="mi-check"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4.5 12.5l5 5 10-11"/></svg></span>
                 </div>
@@ -362,7 +363,7 @@ body {
                   <span class="mi-icon danger"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3.5 1.8 20.5h20.4L12 3.5z"/><line x1="12" y1="10" x2="12" y2="15"/><circle cx="12" cy="17.6" r="0.4" fill="currentColor"/></svg></span>
                   <div class="mi-main">
                     <div class="mi-name">完全访问</div>
-                    <div class="mi-desc">减少确认步骤，对所有任务生效，建议用完即关</div>
+                    <div class="mi-desc">三类高危操作免确认，对所有任务生效，建议用完即关</div>
                   </div>
                   <span class="mi-check"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4.5 12.5l5 5 10-11"/></svg></span>
                 </div>
@@ -447,12 +448,13 @@ body {
 <div class="overlay" id="overlay">
   <div class="modal">
     <h3>确认允许完全访问？</h3>
-    <p>开启完全访问后，所有任务将减少确认步骤并直接操作您的电脑，请谨慎操作。包括：</p>
+    <p>开启完全访问后，以下三类操作将不再逐次确认，对所有任务生效，请谨慎操作：</p>
     <ul class="cap-list">
-      <li><b>文件操作</b>：读取、创建、修改、上传或删除此计算机上任意位置的文件</li>
-      <li><b>终端命令</b>：运行命令、安装软件和更改系统设置</li>
-      <li><b>访问互联网</b>：访问网站、发送数据并使用已启用的连接器</li>
+      <li><b>文件操作</b>：删除文件 / 文件夹、清空目录、批量删除</li>
+      <li><b>终端与安装</b>：运行脚本、安装 / 卸载依赖、调用外部程序</li>
+      <li><b>系统更改</b>：修改系统设置、环境变量与系统服务</li>
     </ul>
+    <p class="cap-note">读取与网络访问不受档位限制；清空系统目录、磁盘级不可逆操作仍需确认。</p>
     <label class="risk-check">
       <input type="checkbox" id="riskAck">
       <span>我已了解风险，并对自己的数据安全负责</span>
