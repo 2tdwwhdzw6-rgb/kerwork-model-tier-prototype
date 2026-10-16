@@ -126,27 +126,6 @@ body {
 .perm-menu .mi-icon { color: #6f6f6b; padding-top: 1px; }
 .perm-menu .mi-icon.danger { color: #d5493a; }
 
-/* ---------- 档位置灰不可选 ---------- */
-.menu-item.disabled { cursor: not-allowed; }
-.menu-item.disabled:hover { background: none; }
-.menu-item.disabled .mi-name { color: #b9b9b5; }
-.menu-item.disabled .mi-desc { color: #c9c9c4; }
-.menu-item.disabled .mi-rate { color: #c9c9c4; }
-.menu-item.disabled .mi-check { visibility: hidden; }
-.tier-tooltip {
-  display: none; position: absolute; right: calc(100% + 12px); top: 50%;
-  transform: translateY(-50%); width: 250px; background: #3c3c3a; color: #fff;
-  border-radius: 10px; padding: 11px 13px; z-index: 40; pointer-events: none; text-align: left;
-}
-.tier-tooltip::after {
-  content: ''; position: absolute; left: 100%; top: 50%; transform: translateY(-50%);
-  border: 6px solid transparent; border-left-color: #3c3c3a;
-}
-.menu-item.disabled:hover .tier-tooltip { display: block; }
-.tt-title { font-size: 13px; font-weight: 600; }
-.tt-line { margin-top: 6px; font-size: 12px; color: #d9d9d5; line-height: 1.55; }
-.tt-label { color: #fff; font-weight: 500; margin-right: 2px; }
-
 /* ---------- 原型演示控制 ---------- */
 .demo-ctrl {
   position: fixed; left: 16px; bottom: 16px; z-index: 60;
@@ -402,6 +381,13 @@ body {
 }
 .done-bubble .t { font-weight: 600; margin-bottom: 4px; }
 .done-bubble .meta { font-size: 12px; color: #9a9a96; margin-top: 8px; display: flex; gap: 14px; flex-wrap: wrap; }
+.error-bubble {
+  background: #fdf3f2; border: 1px solid #f2c4c0; border-radius: 14px;
+  padding: 13px 16px; max-width: 600px; font-size: 13.5px; line-height: 1.75;
+  animation: fadeUp .35s ease; margin-bottom: 18px;
+}
+.error-bubble .t { font-weight: 600; margin-bottom: 4px; color: #d5493a; }
+.error-bubble .meta { font-size: 12px; color: #9a9a96; margin-top: 8px; display: flex; gap: 14px; flex-wrap: wrap; }
 .chat-composer {
   flex-shrink: 0; margin: 0 40px 18px; max-width: 760px; width: calc(100% - 80px);
   align-self: center; border: 1px solid #ececea; border-radius: 14px;
@@ -501,18 +487,13 @@ body {
               <span id="tierLabel">均衡</span>
               <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
               <div class="menu tier-menu" id="tierMenu">
-                <div class="menu-item disabled" data-tier="极速">
+                <div class="menu-item" data-tier="极速">
                   <div class="mi-main">
                     <div class="mi-name">极速</div>
                     <div class="mi-desc">极速响应，快速完成基础任务</div>
                   </div>
                   <span class="mi-rate">低</span>
                   <span class="mi-check"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4.5 12.5l5 5 10-11"/></svg></span>
-                  <div class="tier-tooltip">
-                    <div class="tt-title">极速档暂不可用</div>
-                    <div class="tt-line"><span class="tt-label">原因：</span>该档位模型池均在维护中，暂无法提供服务</div>
-                    <div class="tt-line"><span class="tt-label">建议：</span>稍后重试，或使用均衡 / 深度档提交任务</div>
-                  </div>
                 </div>
                 <div class="menu-item selected" data-tier="均衡">
                   <div class="mi-main">
@@ -715,7 +696,7 @@ body {
       <input type="checkbox" id="fastUnavailable" checked>
       <span class="switch-track"></span>
     </label>
-    <span>极速档不可用</span>
+    <span>极速档不可用（提交后对话内报错）</span>
   </div>
 </div>
 
@@ -765,7 +746,6 @@ function selectTier(name) {
 tierMenu.querySelectorAll('.menu-item').forEach((item) => {
   item.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (item.classList.contains('disabled')) return;
     selectTier(item.dataset.tier);
     closeMenus();
   });
@@ -827,11 +807,6 @@ taskInput.addEventListener('input', () => {
 });
 
 const fastUnavailable = document.getElementById('fastUnavailable');
-const fastItem = tierMenu.querySelector('[data-tier="极速"]');
-fastUnavailable.addEventListener('change', () => {
-  fastItem.classList.toggle('disabled', fastUnavailable.checked);
-  if (fastUnavailable.checked && tierLabel.textContent === '极速') selectTier('均衡');
-});
 
 document.getElementById('settingsBtn').addEventListener('click', () => {
   settingsPage.classList.add('show');
@@ -896,7 +871,23 @@ function enterChat(text) {
   chatClear();
   chatPermChip.textContent = permFull ? '替我审批 · 已开启' : '请求批准';
   chatPermChip.classList.toggle('on-behalf', permFull);
+  if (fastUnavailable.checked && tierLabel.textContent === '极速') { playTierError(text); return; }
   if (permFull) playBehalf(text); else playAsk(text);
+}
+/* ---- 极速档不可用：不做选择器禁用，提交后对话内报错（沿用现有报错体系） ---- */
+function playTierError(task) {
+  chatSchedule([
+    { d: 200, fn: () => chatAddUser(task) },
+    { d: 600, fn: chatAddTierError },
+  ]);
+}
+function chatAddTierError() {
+  chatAppend(chatEl(`
+    <div class="error-bubble">
+      <div class="t">任务执行失败</div>
+      极速档模型池均在维护中，暂无法提供服务，本次请求未能执行。
+      <div class="meta"><span>档位：极速</span><span>系统不自动跨档</span><span>可稍后重试，或切换其他档位后重新提交</span></div>
+    </div>`));
 }
 function exitChat() {
   chatClear();
