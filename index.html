@@ -126,25 +126,6 @@ body {
 .perm-menu .mi-icon { color: #6f6f6b; padding-top: 1px; }
 .perm-menu .mi-icon.danger { color: #d5493a; }
 
-/* ---------- 原型演示控制 ---------- */
-.demo-ctrl {
-  position: fixed; left: 16px; bottom: 16px; z-index: 60;
-  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
-  background: rgba(255,255,255,.94); border: 1px dashed #c9c9c4; border-radius: 12px;
-  padding: 9px 12px; font-size: 12px; color: #6f6f6b;
-}
-.demo-row { display: flex; align-items: center; gap: 8px; }
-.demo-tag { background: #efefec; border-radius: 4px; padding: 1px 6px; font-size: 11px; color: #6f6f6b; }
-.switch { position: relative; display: inline-flex; }
-.switch input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; z-index: 1; }
-.switch-track { width: 34px; height: 20px; background: #d9d9d5; border-radius: 999px; position: relative; transition: background .15s; }
-.switch-track::after {
-  content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
-  border-radius: 50%; background: #fff; transition: left .15s; box-shadow: 0 1px 2px rgba(0,0,0,.15);
-}
-.switch input:checked + .switch-track { background: #d5493a; }
-.switch input:checked + .switch-track::after { left: 16px; }
-
 /* ---------- 设置页（积分明细） ---------- */
 .settings-page { position: fixed; inset: 0; z-index: 70; background: #fff; display: none; overflow: auto; }
 .settings-page.show { display: flex; }
@@ -381,13 +362,6 @@ body {
 }
 .done-bubble .t { font-weight: 600; margin-bottom: 4px; }
 .done-bubble .meta { font-size: 12px; color: #9a9a96; margin-top: 8px; display: flex; gap: 14px; flex-wrap: wrap; }
-.error-bubble {
-  background: #fdf3f2; border: 1px solid #f2c4c0; border-radius: 14px;
-  padding: 13px 16px; max-width: 600px; font-size: 13.5px; line-height: 1.75;
-  animation: fadeUp .35s ease; margin-bottom: 18px;
-}
-.error-bubble .t { font-weight: 600; margin-bottom: 4px; color: #d5493a; }
-.error-bubble .meta { font-size: 12px; color: #9a9a96; margin-top: 8px; display: flex; gap: 14px; flex-wrap: wrap; }
 .chat-composer {
   flex-shrink: 0; margin: 0 40px 18px; max-width: 760px; width: calc(100% - 80px);
   align-self: center; border: 1px solid #ececea; border-radius: 14px;
@@ -689,17 +663,6 @@ body {
   </main>
 </div>
 
-<div class="demo-ctrl">
-  <div class="demo-row">
-    <span class="demo-tag">原型演示</span>
-    <label class="switch">
-      <input type="checkbox" id="fastUnavailable" checked>
-      <span class="switch-track"></span>
-    </label>
-    <span>极速档不可用（提交后对话内报错）</span>
-  </div>
-</div>
-
 <script>
 const tierSelector = document.getElementById('tierSelector');
 const tierMenu = document.getElementById('tierMenu');
@@ -806,8 +769,6 @@ taskInput.addEventListener('input', () => {
   sendBtn.classList.toggle('active', taskInput.value.trim().length > 0);
 });
 
-const fastUnavailable = document.getElementById('fastUnavailable');
-
 document.getElementById('settingsBtn').addEventListener('click', () => {
   settingsPage.classList.add('show');
 });
@@ -871,23 +832,7 @@ function enterChat(text) {
   chatClear();
   chatPermChip.textContent = permFull ? '替我审批 · 已开启' : '请求批准';
   chatPermChip.classList.toggle('on-behalf', permFull);
-  if (fastUnavailable.checked && tierLabel.textContent === '极速') { playTierError(text); return; }
   if (permFull) playBehalf(text); else playAsk(text);
-}
-/* ---- 极速档不可用：不做选择器禁用，提交后对话内报错（沿用现有报错体系） ---- */
-function playTierError(task) {
-  chatSchedule([
-    { d: 200, fn: () => chatAddUser(task) },
-    { d: 600, fn: chatAddTierError },
-  ]);
-}
-function chatAddTierError() {
-  chatAppend(chatEl(`
-    <div class="error-bubble">
-      <div class="t">任务执行失败</div>
-      极速档模型池均在维护中，暂无法提供服务，本次请求未能执行。
-      <div class="meta"><span>档位：极速</span><span>系统不自动跨档</span><span>可稍后重试，或切换其他档位后重新提交</span></div>
-    </div>`));
 }
 function exitChat() {
   chatClear();
